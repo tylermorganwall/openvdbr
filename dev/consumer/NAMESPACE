@@ -1,0 +1,4 @@
+useDynLib(openvdbrconsumer, .registration = TRUE)
+importFrom(openvdbr, vdb_version)
+export(check_runtime)
+export(check_handle)

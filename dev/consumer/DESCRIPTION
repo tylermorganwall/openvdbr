@@ -1,0 +1,11 @@
+Package: openvdbrconsumer
+Title: Test the OpenVDB Runtime Interface
+Version: 0.0.1
+Authors@R: person("Tyler", "Morgan-Wall", email = "tylermw@gmail.com", role = c("aut", "cre"))
+Description: Exercises the OpenVDB C function table from C and C++ without
+    linking against OpenVDB or including its C++ headers.
+License: Apache License (== 2.0)
+Imports: openvdbr
+LinkingTo: openvdbr
+Encoding: UTF-8
+NeedsCompilation: yes

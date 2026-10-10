@@ -1,0 +1,21 @@
+PKG_CPPFLAGS = -I../inst/include
+PKG_CXXFLAGS = $(CXX_VISIBILITY)
+PKG_LIBS = build/libopenvdbr_core.a build/libblosc.a -Lbuild/runtime -lopenvdbr_tbb -lz
+OBJECTS = r_api.o
+export OPENVDBR_CPPFLAGS = $(CPPFLAGS)
+export OPENVDBR_LDFLAGS = $(LDFLAGS)
+ifeq ($(shell uname -s),Darwin)
+PKG_LIBS += -Wl,-rpath,@loader_path -Wl,-exported_symbols_list,backend/openvdbr.exports
+else
+PKG_LIBS += -Wl,-rpath,'$$ORIGIN' -Wl,--version-script=backend/openvdbr.map
+endif
+
+all: $(SHLIB)
+$(SHLIB): backend
+.PHONY: backend
+backend:
+	"$(R_HOME)/bin/Rscript" --vanilla ../tools/build.R "$(CXX)" "$(ALL_CXXFLAGS)" "$(CC)" "$(ALL_CFLAGS)"
+
+clean:
+	rm -f $(OBJECTS) $(SHLIB)
+	rm -rf build

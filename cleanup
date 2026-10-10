@@ -1,0 +1,4 @@
+#!/bin/sh
+rm -rf src/build
+rm -f src/*.o src/*.so src/*.dll
+rm -f src/CMakeLists.txt

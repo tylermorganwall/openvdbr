@@ -1,0 +1,27 @@
+Package: openvdbr
+Type: Package
+Title: Sparse Volumes with an 'OpenVDB' Runtime Interface
+Version: 13.1.0-2
+Authors@R: c(
+    person("Tyler", "Morgan-Wall", email = "tylermw@gmail.com",
+        role = c("aut", "cre", "cph"),
+        comment = c(ORCID = "0000-0002-3131-3814")),
+    person("Contributors to the OpenVDB Project", role = c("ctb", "cph")),
+    person("Intel Corporation and oneTBB contributors", role = "cph"),
+    person("Blosc Development Team", role = "cph"))
+Description: Creates, edits, and samples sparse volumetric grids using
+    'OpenVDB' <https://www.openvdb.org/>. Supports signed distance fields,
+    constructive solid geometry, conversion between triangle meshes and
+    volumes, file exchange, and a native runtime interface.
+License: Apache License (== 2.0)
+Copyright: file inst/COPYRIGHTS
+Depends: R (>= 4.3.0)
+Imports: Rcpp
+LinkingTo: Rcpp
+Suggests: testthat (>= 3.2.3)
+SystemRequirements: GNU make, CMake (>= 3.24), zlib
+Encoding: UTF-8
+NeedsCompilation: yes
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

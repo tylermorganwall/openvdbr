@@ -1,0 +1,11 @@
+src/build/
+src/*.o
+src/*.so
+src/*.dll
+*.tar.gz
+*.Rcheck/
+.Rproj.user/
+**/*.o
+**/*.so
+**/*.dll
+**/_problems/

@@ -1,0 +1,7 @@
+^dev$
+^air\.toml$
+^\.git.*$
+^.*\.Rproj$
+^src/build$
+^openvdbr_.*\.tar\.gz$
+^tests/testthat/_problems$

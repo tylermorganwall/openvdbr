@@ -1,0 +1,42 @@
+openvdbr R interface, provider and runtime API:
+  Copyright 2026 Tyler Morgan-Wall.
+  Apache License 2.0.
+
+Bundled sources (upstream file-level notices are retained):
+
+OpenVDB 13.1.0 (src/vendor/openvdb)
+  Copyright Contributors to the OpenVDB Project.
+  Apache License 2.0; see licenses/OpenVDB-LICENSE.
+  https://github.com/AcademySoftwareFoundation/openvdb/tree/v13.1.0
+
+OpenVDB's builtin Imath half implementation (src/vendor/imath)
+  Copyright Contributors to the OpenEXR Project.
+  BSD 3-Clause; see licenses/Imath-LICENSE.
+  Taken from ext/imath in OpenVDB 13.1.0, not a separate full Imath library.
+
+oneTBB 2023.1.0 (src/vendor/onetbb)
+  Copyright Intel Corporation and contributors.
+  Apache License 2.0; see licenses/oneTBB-LICENSE.
+  Additional upstream notices: licenses/oneTBB-third-party.txt.
+  https://github.com/uxlfoundation/oneTBB/tree/v2023.1.0
+
+c-blosc 1.21.6 (src/vendor/blosc)
+  Copyright 2009-2018 Francesc Alted and 2019-present Blosc Development Team.
+  BSD 3-Clause; see licenses/Blosc-LICENSE.
+  https://github.com/Blosc/c-blosc/tree/v1.21.6
+  Included compression components retain their individual licenses:
+    LZ4 1.9.4: Yann Collet, BSD 2-Clause (licenses/LZ4.txt).
+    Zstd 1.5.6: Meta Platforms, Inc. and affiliates, BSD 3-Clause option
+      (licenses/Zstd-LICENSE).
+    Bitshuffle: Kiyoshi Masui, MIT (licenses/BITSHUFFLE.txt).
+    BloscLZ derives from FastLZ: Ariya Hidayat, MIT (licenses/FASTLZ.txt).
+    Portable stdint definitions: Alexander Chemeris, BSD 3-Clause
+      (licenses/STDINT.txt).
+  Other original Blosc license notices are retained in licenses/ as well.
+
+The build links the system zlib library. It does not bundle R or Rcpp;
+Rcpp is a separate Imports/LinkingTo dependency.
+
+NanoVDB headers (src/vendor/nanovdb), from OpenVDB v13.1.0:
+  Copyright Contributors to the OpenVDB Project.
+  Apache License 2.0; see licenses/OpenVDB-LICENSE.
