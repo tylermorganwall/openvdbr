@@ -25,3 +25,4 @@
 ^config[.]log$
 
 ^src/vendor/CMakeLists[.]txt$
+^\.github$
