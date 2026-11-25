@@ -1,3 +1,4 @@
+// Modified for openvdbr by Tyler Morgan-Wall, 2026: R embedding; see src/vendor/README.md.
 // Copyright Contributors to the OpenVDB Project
 // SPDX-License-Identifier: Apache-2.0
 ///
@@ -13,8 +14,8 @@ namespace openvdb {
 OPENVDB_USE_VERSION_NAMESPACE
 namespace OPENVDB_VERSION_NAME {
 
-/// @brief  Trigger a SIGABRT after printing a formatted assertion message.
-///   Effectively performs the same functionality as cassert, but allows
+/// @brief  Report a native invariant failure and unwind to the provider boundary.
+///   The R adaptation invalidates the provider for this session and allows
 ///   VDB code to call this independently of the NDEBUG define.
 /// @param assertion  The variable or expression that triggered the assertion
 ///   as a string

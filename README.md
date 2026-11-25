@@ -15,14 +15,27 @@ install.packages('/path/to/openvdbr', repos = NULL, type = 'source')
 ```
 
 A source build needs R's compiler toolchain, GNU make, CMake >= 3.24, and zlib.
-OpenVDB, oneTBB and Blosc sources are included; the build does not download
-anything or require a system OpenVDB installation. The default nested build
+`configure` and `configure.win` call `tools/configure.R`, which selects all
+dependencies and flags and generates Makevars. R compiles the package sources
+and links the final library. Vendored sources stay under `src/vendor`.
+Configuration stages the recipe from `tools/vendor/CMakeLists.txt` into that
+source directory; CMake builds only OpenVDB and, when needed, Blosc.
+OpenVDB and fallback Blosc sources are included; oneTBB is supplied by the
+RcppParallel dependency. CRAN's `blosc` package does not expose native headers or
+a library for other packages to link against. A compatible system Blosc 1.x
+(>= 1.17.0) is preferred
+when its headers and required functions pass a compile-and-link check. Detection
+uses `pkg-config`, then standard installation paths; `BLOSC_INCLUDE_DIR` and
+`BLOSC_LIB_DIR` can specify a custom installation. Otherwise the bundled Blosc
+1.21.6 is built. Set `OPENVDBR_USE_SYSTEM_BLOSC=false` to force the bundled copy. The build does not download sources or require a system OpenVDB
+installation. The default nested build
 uses two compiler processes. Set `CMAKE_BUILD_PARALLEL_LEVEL` to change it.
 OpenVDB's templates make the first build substantial.
 
-oneTBB is built as a package-specific shared library and installed beside the
-provider DLL. OpenVDB and Blosc are compiled into that provider only. Consumers
-do not embed another copy of those libraries.
+OpenVDB and, when used, bundled Blosc are statically linked into the provider DLL.
+System Blosc uses the selected installation's linker flags. Its TBB calls
+use RcppParallel's shared runtime. Consumers use the provider's registered C
+interface without embedding another OpenVDB copy.
 
 ## R example
 
@@ -91,8 +104,9 @@ opaque pointers, fixed-width integers and caller-owned error buffers. No
 OpenVDB C++ types cross the package boundary. It works from C as well as C++.
 
 See [the runtime contract](inst/runtime-api.md) for ownership, sampling,
-threading and error handling. [dev/consumer](dev/consumer) is a complete small
-consumer package, including a C compilation check and concurrent sampling test.
+threading and error handling. The source repository includes a complete small
+consumer package in `dev/consumer`, with a C compilation check and concurrent
+sampling test.
 
 ## Current scope
 
@@ -113,3 +127,8 @@ Bundled licenses and source provenance are recorded in
 Library warnings are available from `vdb_messages()`. The provider buffers them
 safely when they originate on worker threads; operation failures still return
 native error statuses or raise R errors.
+
+Native operations use at most two threads by default. Set the environment
+variable `OPENVDBR_NUM_THREADS` to a positive integer to request another limit.
+OpenVDB and bundled Blosc messages are available via `vdb_messages()`.
+After a native invariant failure, restart R before using the provider again.

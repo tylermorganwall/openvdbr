@@ -1,6 +1,11 @@
 #ifndef OPENVDBR_INTERNAL_H
 #define OPENVDBR_INTERNAL_H
 #include "provider.h"
+#include "diagnostics.h"
+#include <tbb/global_control.h>
+#include <cstdlib>
+#include <cerrno>
+#include <climits>
 #include <openvdb/openvdb.h>
 #include <openvdb/io/File.h>
 #include <cmath>
@@ -48,7 +53,21 @@ inline void error_message(openvdbr_error* error, const char* message) noexcept {
 template<class Function> int32_t guarded(openvdbr_error* error, Function function) noexcept {
     if (error) error->message[0] = '\0';
     try {
+        openvdbr_check_failure();
+        // Limit this private scheduler across simultaneous calls and consumers.
+        // A scoped control restores the prior limit when the operation ends.
+        unsigned long threads = 2;
+        if (const char* value = std::getenv("OPENVDBR_NUM_THREADS")) {
+            char* end = nullptr;
+            errno = 0;
+            threads = std::strtoul(value, &end, 10);
+            require(*value >= '0' && *value <= '9' && *end == '\0' &&
+                    errno == 0 && threads >= 1 && threads <= INT_MAX,
+                    "OPENVDBR_NUM_THREADS must be a positive integer");
+        }
+        tbb::global_control limit(tbb::global_control::max_allowed_parallelism, threads);
         function();
+        openvdbr_check_failure();
         return OPENVDBR_OK;
     } catch (const Failure& failure) {
         error_message(error, failure.what()); return failure.status;

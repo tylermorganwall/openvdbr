@@ -23,17 +23,12 @@ CSG signs, closed mesh topology, and mesh/volume round trips.
 using upstream APIs directly. It contains a rotated/translated float grid and
 a vector grid. Its constructor is separate from the provider wrappers, so the
 import test does not just round-trip transforms made by the same R code.
-After building the package backend, regenerate it on macOS with:
-
-```sh
-clang++ -std=gnu++17 -O2 -DNDEBUG -DOPENVDB_STATICLIB \
-  -Isrc -Iinst/include -Isrc/build/include -Isrc/build/include/openvdb \
-  -Isrc/vendor -Isrc/vendor/imath -Isrc/vendor/onetbb/include \
-  dev/create-fixtures.cpp src/build/libopenvdbr_core.a src/build/libblosc.a \
-  -Lsrc/build/runtime -lopenvdbr_tbb -lz \
-  -Wl,-rpath,"$PWD/src/build/runtime" -o /tmp/openvdbr-fixtures
-/tmp/openvdbr-fixtures tests/testthat/fixtures/upstream.vdb
-```
+To regenerate it, compile `dev/create-fixtures.cpp` and `src/diagnostics.cpp`
+using the compiler, include paths and link flags selected in `src/Makevars`.
+The vendored OpenVDB archive is `src/build/libopenvdb.a`; Blosc may be supplied
+by the system or `src/build/libblosc.a`. TBB is supplied by RcppParallel.
+Run the resulting executable with `tests/testthat/fixtures/upstream.vdb` as its
+output path.
 
 The standalone diagnostic-queue test checks concurrent writes, bounded storage,
 overflow reporting, truncation and draining:

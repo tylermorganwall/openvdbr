@@ -149,7 +149,9 @@ static int32_t g_compressor = BLOSC_BLOSCLZ;  /* the compressor to use by defaul
 static int32_t g_threads = 1;
 static int32_t g_force_blocksize = 0;
 static int32_t g_initlib = 0;
+#if !defined(_WIN32)
 static int32_t g_atfork_registered = 0;
+#endif
 static int32_t g_splitmode = BLOSC_FORWARD_COMPAT_SPLIT;
 
 
@@ -1897,7 +1899,15 @@ static int init_threads(struct blosc_context* context)
   pthread_barrier_init(&context->barr_finish, NULL, context->numthreads+1);
 #else
   pthread_mutex_init(&context->count_threads_mutex, NULL);
-  pthread_cond_init(&context->count_threads_cv, NULL);
+  rc2 = pthread_cond_init(&context->count_threads_cv, NULL);
+  if (rc2 != 0) {
+    /* No workers have started yet; release the synchronization objects and
+       propagate a codec error rather than using an invalid condition variable. */
+    pthread_mutex_destroy(&context->count_threads_mutex);
+    pthread_mutex_destroy(&context->count_mutex);
+    openvdbr_logf("Blosc condition-variable initialization failed: %d", rc2);
+    return -1;
+  }
   context->count_threads = 0;      /* Reset threads counter */
 #endif
 

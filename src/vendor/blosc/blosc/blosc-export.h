@@ -1,3 +1,5 @@
+// Modified for openvdbr by Tyler Morgan-Wall, 2026: Windows portability;
+// see src/vendor/README.md.
 /*********************************************************************
   Blosc - Blocked Shuffling and Compression Library
 
@@ -30,7 +32,7 @@
   #define BLOSC_EXPORT
 #endif  /* defined(BLOSC_SHARED_LIBRARY) */
 
-#if defined(__GNUC__) || defined(__clang__)
+#if (defined(__GNUC__) || defined(__clang__)) && !defined(_WIN32) && !defined(__CYGWIN__)
   #define BLOSC_NO_EXPORT __attribute__((visibility("hidden")))
 #else
   #define BLOSC_NO_EXPORT

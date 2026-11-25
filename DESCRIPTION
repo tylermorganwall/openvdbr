@@ -1,13 +1,12 @@
 Package: openvdbr
 Type: Package
-Title: Sparse Volumes with an 'OpenVDB' Runtime Interface
-Version: 13.1.0-2
+Title: Sparse Volumetric Grids with 'OpenVDB'
+Version: 13.1.0-4
 Authors@R: c(
     person("Tyler", "Morgan-Wall", email = "tylermw@gmail.com",
         role = c("aut", "cre", "cph"),
         comment = c(ORCID = "0000-0002-3131-3814")),
     person("Contributors to the OpenVDB Project", role = c("ctb", "cph")),
-    person("Intel Corporation and oneTBB contributors", role = "cph"),
     person("Blosc Development Team", role = "cph"))
 Description: Creates, edits, and samples sparse volumetric grids using
     'OpenVDB' <https://www.openvdb.org/>. Supports signed distance fields,
@@ -15,9 +14,11 @@ Description: Creates, edits, and samples sparse volumetric grids using
     volumes, file exchange, and a native runtime interface.
 License: Apache License (== 2.0)
 Copyright: file inst/COPYRIGHTS
+URL: https://github.com/tylermorganwall/openvdbr
+BugReports: https://github.com/tylermorganwall/openvdbr/issues
 Depends: R (>= 4.3.0)
-Imports: Rcpp
-LinkingTo: Rcpp
+Imports: Rcpp, RcppParallel (>= 6.2.1)
+LinkingTo: Rcpp, RcppParallel (>= 6.2.1)
 Suggests: testthat (>= 3.2.3)
 SystemRequirements: GNU make, CMake (>= 3.24), zlib
 Encoding: UTF-8

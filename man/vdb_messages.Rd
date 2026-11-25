@@ -10,7 +10,7 @@ vdb_messages()
 A character vector of pending messages, removed from the queue.
 }
 \description{
-Collect warnings and informational diagnostics from the bundled libraries,
+Collect warnings and informational diagnostics from OpenVDB and the bundled Blosc,
 including messages produced on worker threads. Operation failures still raise
 ordinary R errors (or return a status to native consumers).
 }

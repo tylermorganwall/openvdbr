@@ -9,6 +9,9 @@ extern "C" {
 int openvdbr_logf(const char* format, ...);
 int32_t openvdbr_diagnostic_next(openvdbr_error* message);
 #ifdef __cplusplus
+// Internal C++ failure paths unwind to the provider's guarded C boundary.
+[[noreturn]] void openvdbr_fatal(const char* message);
+void openvdbr_check_failure();
 }
 #endif
 #endif

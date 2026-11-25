@@ -1,12 +1,43 @@
-# openvdbr 13.1.0-2.9000
+# openvdbr 13.1.0-4
+
+## Other
+
+- Overall: Centralizes native dependency and compiler configuration in
+  `tools/configure.R`. R compiles and links the package interface; CMake builds
+  only the required library sources under `src/vendor`, using R's architecture and full
+  compiler commands. Unused upstream build tooling,
+  Python/CUDA bindings, examples and legacy codec sources are omitted.
+
+- Overall: Prefers a compatible system Blosc and falls back to the bundled
+  library when the required headers or functions cannot be compiled and linked.
+
+# openvdbr 13.1.0-3
+
+## Bugfixes
+
+- Overall: Uses RcppParallel (>= 6.2.1) for the shared oneTBB runtime instead
+  of building and installing a private copy.
+
+- Overall: Uses R's standard native-library installation, preserving its automatic
+  object-symbol checks without a custom installer.
+
+- Overall: Keeps Blosc's Windows thread functions separate from Rtools' pthread
+  runtime to prevent duplicate-symbol linker errors.
+
+- Overall: Supports Windows builds with Rtools headers missing a loader constant
+  and corrects bundled-library portability diagnostics.
+
+- Overall: Buffers OpenVDB and Blosc diagnostics without writing to the process
+  console and contains their invariant failures at the provider boundary.
+- Overall: Limits runtime parallelism to two threads by default; respects an
+  explicit `OPENVDBR_NUM_THREADS` setting.
 
 ## Other
 
 - Overall: Preserves caller warning settings and forwards R preprocessor and
   linker flags to nested builds, including quoted paths.
 
-- Overall: Keeps compiler diagnostics enabled in bundled libraries and uses the
-  portable oneTBB resumable-task backend on macOS instead of deprecated APIs.
+- Overall: Keeps compiler diagnostics enabled in bundled libraries.
 
 # openvdbr 13.1.0-2
 

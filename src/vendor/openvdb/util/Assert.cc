@@ -1,9 +1,11 @@
+// Modified for openvdbr by Tyler Morgan-Wall, 2026: R embedding; see src/vendor/README.md.
 // Copyright Contributors to the OpenVDB Project
 // SPDX-License-Identifier: Apache-2.0
 ///
 /// @file Platform.h
 
 #include "Assert.h"
+#include "diagnostics.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -19,15 +21,10 @@ namespace OPENVDB_VERSION_NAME {
     const char *function,
     const char* msg)
 {
-    std::fprintf(stderr, "%s:%u:", file, line);
-    std::fprintf(stderr, " Assertion failed: ");
-    std::fprintf(stderr, "'%s'", assertion);
-    std::fprintf(stderr, " in function: ");
-    std::fprintf(stderr, "'%s'", function);
-    if (msg) std::fprintf(stderr, "\n%s", msg);
-    std::fprintf(stderr, "\n");
-    // @todo  could make this optional with another compile define
-    std::abort();
+    char message[1024];
+    std::snprintf(message, sizeof(message), "%s:%u: assertion '%s' in %s: %s",
+        file, line, assertion, function, msg ? msg : "");
+    openvdbr_fatal(message);
 }
 
 }

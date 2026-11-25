@@ -1,11 +1,14 @@
 #include "diagnostics.h"
 #include <array>
+#include <atomic>
+#include <stdexcept>
 #include <cstdarg>
 #include <cstdio>
 #include <mutex>
 #include <limits>
 
 namespace {
+std::atomic<bool> failed{false};
 // A fixed-size queue keeps diagnostics from becoming an unbounded allocation
 // on error paths. Preserve the first messages and report any overflow on drain.
 struct Diagnostics {
@@ -56,4 +59,16 @@ extern "C" int32_t openvdbr_diagnostic_next(openvdbr_error* message) {
         }
     } catch (...) {}
     return 0;
+}
+
+extern "C" [[noreturn]] void openvdbr_fatal(const char* message) {
+    // An invariant failure invalidates this provider for the rest of the session.
+    // Never continue the failed operation or call R from a scheduler worker.
+    failed.store(true, std::memory_order_release);
+    openvdbr_logf("%s", message);
+    throw std::runtime_error(message);
+}
+extern "C" void openvdbr_check_failure() {
+    if (failed.load(std::memory_order_acquire))
+        throw std::runtime_error("OpenVDB is unavailable after a native invariant failure; restart R.");
 }

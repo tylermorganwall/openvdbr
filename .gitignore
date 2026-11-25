@@ -9,3 +9,11 @@ src/*.dll
 **/*.so
 **/*.dll
 **/_problems/
+
+/src/Makevars
+/src/Makevars.win
+/src/CMakeLists.txt
+
+/config.log
+
+/src/vendor/CMakeLists.txt

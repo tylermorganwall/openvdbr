@@ -80,8 +80,6 @@ public:
 
 // Disable deprecation warnings for std::auto_ptr.
 #if defined(__ICC)
-  #pragma warning push
-  #pragma warning disable:1478
 #elif defined(__clang__)
 #elif defined(__GNUC__)
 #endif
@@ -103,7 +101,6 @@ public:
     }
 
 #if defined(__ICC)
-  #pragma warning pop
 #elif defined(__clang__)
 #elif defined(__GNUC__)
 #endif

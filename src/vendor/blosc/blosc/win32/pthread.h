@@ -1,3 +1,5 @@
+// Modified for openvdbr by Tyler Morgan-Wall, 2026: Windows portability;
+// see src/vendor/README.md.
 /*
  * Code for simulating pthreads API on Windows.  This is Git-specific,
  * but it is enough for Numexpr needs too.
@@ -63,6 +65,16 @@ typedef struct {
 	HANDLE continue_broadcast;
 } pthread_cond_t;
 
+/* These implementations use Windows handles, not winpthreads objects.
+ * Keep their linker names private so Rtools' POSIX runtime can coexist. */
+#define pthread_cond_init blosc_internal_pthread_cond_init
+#define pthread_cond_destroy blosc_internal_pthread_cond_destroy
+#define pthread_cond_wait blosc_internal_pthread_cond_wait
+#define pthread_cond_signal blosc_internal_pthread_cond_signal
+#define pthread_cond_broadcast blosc_internal_pthread_cond_broadcast
+#define pthread_create blosc_internal_pthread_create
+#define win32_pthread_join blosc_internal_pthread_join
+
 extern int pthread_cond_init(pthread_cond_t *cond, const void *unused);
 extern int pthread_cond_destroy(pthread_cond_t *cond);
 extern int pthread_cond_wait(pthread_cond_t *cond, CRITICAL_SECTION *mutex);
@@ -97,7 +109,7 @@ extern int win32_pthread_join(pthread_t *thread, void **value_ptr);
 typedef INIT_ONCE pthread_once_t;
 #define PTHREAD_ONCE_INIT INIT_ONCE_STATIC_INIT
 #define pthread_once blosc_internal_pthread_once /* Avoid symbol conflicts */
-static int blosc_internal_pthread_once(pthread_once_t* once_control,
+static inline int blosc_internal_pthread_once(pthread_once_t* once_control,
 																			 void (*init_routine)(void)) {
   BOOL pending;
   InitOnceBeginInitialize(once_control, /*dwFlags=*/0, /*fPending=*/&pending,

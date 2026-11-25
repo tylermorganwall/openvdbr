@@ -1,3 +1,4 @@
+// Modified for openvdbr by Tyler Morgan-Wall, 2026: R embedding; see src/vendor/README.md.
 /*
  * Code for simulating pthreads API on Windows.  This is Git-specific,
  * but it is enough for Numexpr needs too.
@@ -29,6 +30,7 @@
  */
 
 #include "pthread.h"
+#include "diagnostics.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,12 +38,6 @@
 #include <errno.h>
 #include <limits.h>
 
-
-void die(const char *err, ...)
-{
-	printf("%s", err);
-	exit(-1);
-}
 
 static unsigned __stdcall win32_start_routine(void *arg)
 {
@@ -86,15 +82,22 @@ int pthread_cond_init(pthread_cond_t *cond, const void *unused)
 	InitializeCriticalSection(&cond->waiters_lock);
 
 	cond->sema = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
-	if (!cond->sema)
-		die("CreateSemaphore() failed");
+	if (!cond->sema) {
+		openvdbr_logf("CreateSemaphore() failed: %lu", (unsigned long)GetLastError());
+		DeleteCriticalSection(&cond->waiters_lock);
+		return EAGAIN;
+	}
 
 	cond->continue_broadcast = CreateEvent(NULL,	/* security */
 				FALSE,			/* auto-reset */
 				FALSE,			/* not signaled */
 				NULL);			/* name */
-	if (!cond->continue_broadcast)
-		die("CreateEvent() failed");
+	if (!cond->continue_broadcast) {
+		openvdbr_logf("CreateEvent() failed: %lu", (unsigned long)GetLastError());
+		CloseHandle(cond->sema);
+		DeleteCriticalSection(&cond->waiters_lock);
+		return EAGAIN;
+	}
 
 	return 0;
 }

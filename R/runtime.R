@@ -16,6 +16,7 @@
 #'   consumers remain alive is unsupported.
 #' @useDynLib openvdbr, .registration = TRUE
 #' @importFrom Rcpp evalCpp
+#' @importFrom RcppParallel RcppParallelLibs
 #' @export
 vdb_version = function() .Call(C_vdb_version)
 
@@ -25,7 +26,7 @@ vdb_api = function() .Call(C_vdb_api, asNamespace('openvdbr'))
 
 #' Retrieve buffered library diagnostics
 #'
-#' Collect warnings and informational diagnostics from the bundled libraries,
+#' Collect warnings and informational diagnostics from OpenVDB and the bundled Blosc,
 #' including messages produced on worker threads. Operation failures still raise
 #' ordinary R errors (or return a status to native consumers).
 #' @return A character vector of pending messages, removed from the queue.
