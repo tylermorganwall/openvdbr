@@ -1,3 +1,10 @@
+# openvdbr 13.1.0-5
+
+- Fixed Windows installation from a source tarball by shipping the DLL export
+  file under the name R's linker expects.
+- Fixed the Linux configure check for oneTBB when RcppParallel supplies the
+  library at runtime.
+
 # openvdbr 13.1.0-4
 
 ## Other

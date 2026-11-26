@@ -92,7 +92,20 @@ configure_package = function() {
   log = normalizePath(".", winslash = "/")
   log = file.path(log, "config.log")
   writeLines("openvdbr dependency probes (R's configured C++ compiler)", log)
-  if (!probe_library("tbb", tbb_cppflags, tbb_libs, config, probe_dir, log)) {
+  # On Linux RcppParallel loads oneTBB into R. The standalone probe has to
+  # link it explicitly, even when RcppParallelLibs() emits no flags for a DLL.
+  tbb_probe_libs = tbb_libs
+  if (Sys.info()[["sysname"]] == "Linux" && !nzchar(trimws(tbb_libs))) {
+    tbb_library = RcppParallel::tbbLibraryPath("tbb")
+    tbb_probe_libs = if (is.null(tbb_library)) {
+      "-ltbb"
+    } else {
+      shQuote(tbb_library, type = "sh")
+    }
+  }
+  if (
+    !probe_library("tbb", tbb_cppflags, tbb_probe_libs, config, probe_dir, log)
+  ) {
     stop(
       "RcppParallel's oneTBB headers and libraries are incompatible with R's compiler; see config.log."
     )
@@ -339,7 +352,8 @@ configure_package = function() {
   saveRDS(signature, stamp)
 
   exports = if (windows) {
-    "openvdbr.def"
+    # R's Windows linker rule picks up src/openvdbr-win.def.
+    ""
   } else if (macos) {
     "-Wl,-exported_symbols_list,openvdbr.exports"
   } else {
