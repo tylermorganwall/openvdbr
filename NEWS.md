@@ -1,3 +1,9 @@
+# openvdbr 13.1.0-6
+
+## Bugfixes
+
+- Overall: Builds with C23 compilers when using bundled Blosc.
+
 # openvdbr 13.1.0-5
 
 - Fixed Windows installation from a source tarball by shipping the DLL export

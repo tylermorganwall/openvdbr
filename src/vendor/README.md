@@ -17,6 +17,7 @@ Local upstream-source changes in this revision:
 - `blosc/blosc/shuffle.c`: the generic ARM shuffle fallback is expected, so its
   compile-time warning is replaced by a comment. An explicit void use avoids
   an unused-variable warning when both SIMD implementations are disabled.
+  An unused legacy typedef for `bool` is removed for C23 compatibility.
 - `blosc/blosc/blosc.c`: remove the unused compressed-byte accumulator from
   `blosc_d()`; decompression and input bounds checks are unchanged.
 
