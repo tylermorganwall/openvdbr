@@ -1,8 +1,12 @@
 # All toolchain, dependency and platform choices live here. CMake only builds
 # the selected vendored sources; R compiles and links the package interface.
 configure_package = function() {
-  windows = .Platform$OS.type == "windows"
-  macos = Sys.info()[["sysname"]] == "Darwin"
+  wasm = any(grepl(
+    "^--host=wasm32-.*emscripten$",
+    commandArgs(trailingOnly = TRUE)
+  ))
+  windows = !wasm && .Platform$OS.type == "windows"
+  macos = !wasm && Sys.info()[["sysname"]] == "Darwin"
   cmake = Sys.getenv("CMAKE", unname(Sys.which("cmake")))
   if (!nzchar(cmake)) {
     stop("CMake >= 3.24 is required; install it or set CMAKE.")
@@ -95,7 +99,12 @@ configure_package = function() {
   # On Linux RcppParallel loads oneTBB into R. The standalone probe has to
   # link it explicitly, even when RcppParallelLibs() emits no flags for a DLL.
   tbb_probe_libs = tbb_libs
-  if (Sys.info()[["sysname"]] == "Linux" && !nzchar(trimws(tbb_libs))) {
+  if (wasm) {
+    # webR loads RcppParallel before this side module and resolves its oneTBB
+    # imports there. The R process running configure has host libraries.
+    tbb_libs = ""
+    tbb_probe_libs = ""
+  } else if (Sys.info()[["sysname"]] == "Linux" && !nzchar(trimws(tbb_libs))) {
     tbb_library = RcppParallel::tbbLibraryPath("tbb")
     tbb_probe_libs = if (is.null(tbb_library)) {
       "-ltbb"
@@ -351,8 +360,8 @@ configure_package = function() {
   }
   saveRDS(signature, stamp)
 
-  exports = if (windows) {
-    # R's Windows linker rule picks up src/openvdbr-win.def.
+  exports = if (windows || wasm) {
+    # Windows picks up src/openvdbr-win.def; webR links an Emscripten side module.
     ""
   } else if (macos) {
     "-Wl,-exported_symbols_list,openvdbr.exports"

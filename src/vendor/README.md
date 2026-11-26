@@ -14,6 +14,9 @@ selected CMake targets.
 
 Local upstream-source changes in this revision:
 
+- `nanovdb/util/Util.h`: select `std::atomic_ref` by its library feature macro
+  so older libc++ versions use NanoVDB’s existing atomic builtins in C++20 mode.
+
 - `blosc/blosc/shuffle.c`: the generic ARM shuffle fallback is expected, so its
   compile-time warning is replaced by a comment. An explicit void use avoids
   an unused-variable warning when both SIMD implementations are disabled.

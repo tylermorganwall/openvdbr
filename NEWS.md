@@ -1,6 +1,17 @@
-# openvdbr 13.1.0-6
+# openvdbr 13.1.0-7
 
 ## Bugfixes
+
+- Joins idle oneTBB workers at R shutdown so Valgrind can account for their
+  thread-local storage after OpenVDB operations.
+
+- WebAssembly builds resolve oneTBB calls through the wasm RcppParallel
+  package when webR loads openvdbr.
+
+- Fixes Intel macOS builds with Xcode 16.2, whose C++ standard library lacks
+  `std::atomic_ref`.
+
+# openvdbr 13.1.0-6
 
 - Overall: Builds with C23 compilers when using bundled Blosc.
 

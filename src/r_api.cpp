@@ -2,11 +2,31 @@
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
 #include "provider.h"
+#include <tbb/global_control.h>
 #include <memory>
 #include <vector>
 
 namespace {
-const openvdbr_api_v1* api() { return openvdbr_provider_api(); }
+// API lookup and R finalizers run on R's main thread.
+bool provider_used = false;
+
+SEXP r_join_workers() {
+    if (!provider_used) return R_NilValue;
+    provider_used = false;
+    try {
+        tbb::task_scheduler_handle scheduler{tbb::attach{}};
+        // Another consumer may still own the shared RcppParallel scheduler.
+        tbb::finalize(scheduler, std::nothrow);
+    } catch (...) {
+        // Attaching can allocate. Never unwind through an R finalizer.
+    }
+    return R_NilValue;
+}
+
+const openvdbr_api_v1* api() {
+    provider_used = true;
+    return openvdbr_provider_api();
+}
 void check(int32_t status, const openvdbr_error& error) {
     if (status != OPENVDBR_OK) Rcpp::stop("%s", error.message);
 }
@@ -239,10 +259,15 @@ SEXP r_to_mesh(SEXP handle, SEXP isovalue, SEXP adaptivity) {
     END_RCPP
 }
 const openvdbr_api_v1* get_api_v1(uint32_t version) { return version == 1 ? api() : nullptr; }
-const openvdbr_volume_api_v1* get_volume_api_v1(uint32_t version) { return version == 1 ? openvdbr_provider_volume_api() : nullptr; }
+const openvdbr_volume_api_v1* get_volume_api_v1(uint32_t version) {
+    if (version != 1) return nullptr;
+    provider_used = true;
+    return openvdbr_provider_volume_api();
+}
 }
 extern "C" void attribute_visible R_init_openvdbr(DllInfo* dll) {
     const R_CallMethodDef methods[] = {
+        {"C_vdb_join_workers", (DL_FUNC)&r_join_workers, 0},
         {"C_vdb_version", (DL_FUNC)&r_version, 0}, {"C_vdb_api", (DL_FUNC)&r_api, 1},
         {"C_vdb_messages", (DL_FUNC)&r_messages, 0},
         {"C_vdb_grid", (DL_FUNC)&r_create, 5}, {"C_vdb_sphere", (DL_FUNC)&r_sphere, 5},
